@@ -28,6 +28,6 @@ int main()
         out << bi << endl;
     }
     out.close();
-    cout << "Binary form of first " << n << " decimals have been saved in output1.dat";
+    cout << "Binary of " << n << "numbers are saved in outBin.dat" << endl;
     return 0;
 }
