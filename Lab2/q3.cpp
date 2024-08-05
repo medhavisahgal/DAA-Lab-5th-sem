@@ -53,7 +53,7 @@ int main()
     bubbleSort(arr, n);
     end = clock();
     double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
-    cout << "Time taken by Bubble Sort : " << fixed << time_taken << setprecision(5)<<endl;
+    cout << "Time taken by Bubble Sort : " << fixed << time_taken << setprecision(5) << endl;
     clock_t start1, end1;
     start1 = clock();
     selectionSort(arr, n);
