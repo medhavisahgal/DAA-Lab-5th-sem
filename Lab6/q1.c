@@ -67,7 +67,7 @@ void primMST(int start) {
 }
 
 int main() {
-    FILE *file = fopen("inAdjMat.dat", "r");
+    FILE *file = fopen("inUnAdjMat.dat", "r");
     if (file == NULL) {
         printf("Error opening file.\n");
         return 1;

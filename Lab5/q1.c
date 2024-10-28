@@ -1,68 +1,85 @@
 #include <stdio.h>
-#include <stdlib.h>
+struct ITEM {
+    int item_id;
+    float item_profit;
+    float item_weight;
+    float profit_weight_ratio;
+};
 
-typedef struct {
-    int id;
-    float profit;
-    float weight;
-    float ratio;
-} ITEM;
+void swap(struct ITEM *a, struct ITEM *b) {
+    struct ITEM temp = *a;
+    *a = *b;
+    *b = temp;
+}
+void heapify(struct ITEM arr[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
 
-int compare(const void *a, const void *b) {
-    ITEM *itemA = (ITEM *)a;
-    ITEM *itemB = (ITEM *)b;
-    if (itemB->ratio > itemA->ratio) return 1;
-    if (itemB->ratio < itemA->ratio) return -1;
-    return 0;
+    if (left < n && arr[left].profit_weight_ratio > arr[largest].profit_weight_ratio)
+        largest = left;
+
+    if (right < n && arr[right].profit_weight_ratio > arr[largest].profit_weight_ratio)
+        largest = right;
+
+    if (largest != i) {
+        swap(&arr[i], &arr[largest]);
+        heapify(arr, n, largest);
+    }
 }
 
-float fractionalKnapsack(ITEM items[], int n, float capacity) {
-    qsort(items, n, sizeof(ITEM), compare);
-
-    float totalProfit = 0.0;
-    float currentWeight = 0.0;
-
-    printf("\nOutput:\n");
-    printf("Item No\tprofit\t\tWeight\t\tAmount to be taken\n");
-
-    for (int i = 0; i < n; i++) {
-        if (currentWeight + items[i].weight <= capacity) {
-            currentWeight += items[i].weight;
-            totalProfit += items[i].profit;
-            printf("%d\t%.6f\t%.6f\t1.000000\n", items[i].id, items[i].profit, items[i].weight);
-        } else {
-            float remainingCapacity = capacity - currentWeight;
-            float fraction = remainingCapacity / items[i].weight;
-            totalProfit += items[i].profit * fraction;
-            printf("%d\t%.6f\t%.6f\t%.6f\n", items[i].id, items[i].profit, items[i].weight, fraction);
-            break;
-        }
+void heapSort(struct ITEM arr[], int n) {
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+    for (int i = n - 1; i >= 0; i--) {
+        swap(&arr[0], &arr[i]);
+        heapify(arr, i, 0);
     }
-
-    printf("Maximum profit: %.6f\n", totalProfit);
-    return totalProfit;
 }
 
 int main() {
     int n;
     float capacity;
-
     printf("Enter the number of items: ");
     scanf("%d", &n);
-
-    ITEM items[n];
-
-    for (int i = 0; i < n; i++) {
-        items[i].id = i + 1;
+    
+    struct ITEM items[n];
+    for(int i = 0; i < n; i++) {
+        items[i].item_id = i + 1;
         printf("Enter the profit and weight of item no %d: ", i + 1);
-        scanf("%f %f", &items[i].profit, &items[i].weight);
-        items[i].ratio = items[i].profit / items[i].weight;
+        scanf("%f %f", &items[i].item_profit, &items[i].item_weight);
+        items[i].profit_weight_ratio = items[i].item_profit / items[i].item_weight;
     }
-
     printf("Enter the capacity of knapsack: ");
     scanf("%f", &capacity);
-
-    fractionalKnapsack(items, n, capacity);
-
+    heapSort(items, n);
+    float total_profit = 0.0;
+    float remaining_capacity = capacity;
+    float amount_taken[n];
+    
+    for(int i = n-1; i >= 0; i--) { 
+        if(remaining_capacity >= items[i].item_weight) {
+            amount_taken[items[i].item_id - 1] = 1.0;
+            total_profit += items[i].item_profit;
+            remaining_capacity -= items[i].item_weight;
+        }
+        else {
+            amount_taken[items[i].item_id - 1] = remaining_capacity / items[i].item_weight;
+            total_profit += items[i].item_profit * amount_taken[items[i].item_id - 1];
+            remaining_capacity = 0;
+            break;
+        }
+    }
+    printf("\nOutput:\n");
+    printf("Item No\tprofit\t\tWeight\t\tAmount to be taken\n");
+    for(int i = 0; i < n; i++) {
+        printf("%d\t%f\t%f\t%f\n", 
+               i + 1, 
+               items[i].item_profit, 
+               items[i].item_weight, 
+               amount_taken[i]);
+    }
+    printf("Maximum profit: %f\n", total_profit);
+    
     return 0;
 }
